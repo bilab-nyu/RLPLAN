@@ -4,6 +4,15 @@ This repository contains the code for RL-PLAN, developed as part of the paper "G
 * RL-PLAN is an apartment layout generation algorithm based on Deep Reinforcement Learning (DRL).
 * As the target metric, it uses Visibility Graph Analysis (VGA) from Space Syntax theory (Hillier & Hanson, 1989; Turner et al., 2001).
 
+## Requirements:
+* opencv
+* gym
+* torch
+* pygame
+* scipy
+* PIL
+* DepthmapX
+
 The room placement follows a fixed sequence:
 * (Living room) - (Master bedroom) - (Master bathroom) - (Second bedroom) - (Bathroom)
 The room connection matrix is defined as follows:
