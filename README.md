@@ -7,11 +7,15 @@ This repository contains the code for RL-PLAN, developed as part of the paper "G
 The room placement follows a fixed sequence:
 * (Living room) - (Master bedroom) - (Master bathroom) - (Second bedroom) - (Bathroom)
 The room connection matrix is defined as follows:
-| 0 | livingroom | Master bedroom | Master bathroom | Second bedroom | Bathroom |
-| livingroom | - | 1 | 0 | 1 | 1 |
-| Master bedroom | 1 | - | 1 | 0 | 0 |
-| Second bedroom | 1 | 0 | - | 0 | 0 |
-| Bathroom | 1 | 0 | 0 | 0 | - |
+![image](https://github.com/user-attachments/assets/8c861e94-8e67-4266-80c1-d10c5353f7c6)
+
+
+|                 | Living Room     | Master Bedroom   | Master Bathroom   | Second Bedroom   | Bathroom         |
+|-----------------|------------------|------------------|-------------------|------------------|------------------|
+| **Living Room**     | -                | 1                | 0                 | 1                | 1                |
+| **Master Bedroom**  | 1                | -                | 1                 | 0                | 0                |
+| **Second Bedroom**  | 1                | 0                | 0                 | -                | 0                |
+| **Bathroom**        | 1                | 0                | 0                 | 0                | -                |
 
 ## Training Environment
 The agent is trained in a grid-based environment, and two types of data are stored during training for reward computation:
