@@ -160,31 +160,24 @@ class layoutAI:
         doors = [DOOR_SIZE, DOOR_SIZE, DOOR_SIZE, DOOR_SIZE]
         doors_colors = [DOOR, DOOR, DOOR, DOOR]
 
-        # 방의 크기와 해당 색상을 함께 묶은 후 셔플합니다.
         room_pairs = list(zip(rooms, rooms_colors))
         random.shuffle(room_pairs)
-        rooms, rooms_colors = zip(*room_pairs)  # 셔플된 결과를 분리
+        rooms, rooms_colors = zip(*room_pairs) 
 
-        # 셔플된 방과 원래 순서의 문을 합칩니다.
         self.BOX_SIZES = list(rooms) + doors
         self.BOX_COLORS = list(rooms_colors) + doors_colors
         
     def normalize_reward(self, reward):
-        # 만약 처음 보상 업데이트라면 초기화
         if not hasattr(self, 'reward_count'):
             self.reward_count = 0
             self.reward_sum = 0.0
             self.reward_square_sum = 0.0
-        # 보상 누적값 업데이트
         self.reward_count += 1
         self.reward_sum += reward
         self.reward_square_sum += reward ** 2
-        # 평균 계산
         mean_reward = self.reward_sum / self.reward_count
-        # 분산과 표준편차 계산 (분산이 0이면 std=1로 처리)
         variance = self.reward_square_sum / self.reward_count - mean_reward ** 2
         std = np.sqrt(variance) if variance > 0 else 1.0
-        # 정규화: (reward - mean) / (std + 작은값)
         normalized_reward = (reward - mean_reward) / (std + 1e-8)
         return normalized_reward
 
@@ -252,7 +245,7 @@ class layoutAI:
         mask2 = np.all(image == np.array(color2), axis=-1)
 
         if not mask1.any() or not mask2.any():
-            return 0, None  # 0은 실패로 간주
+            return 0, None  
 
         combined_mask = np.logical_or(mask1, mask2)
 
@@ -317,7 +310,7 @@ class layoutAI:
         self.steps = 0
         self.flag = 0
         self.prev_conn = 0
-        # 방(rooms)과 색상(rooms_colors) 정의
+        
         rooms = [
             (random.randint(15,20), random.randint(15,20)),  # livingroom
             (random.randint(10,12), random.randint(10,12)),  # bed1
@@ -327,16 +320,13 @@ class layoutAI:
         ]
         rooms_colors = [LIVING, BED1, BATH1, BED2, BATH2]
 
-        # 방과 색상을 묶어서 셔플
         room_pairs = list(zip(rooms, rooms_colors))
         random.shuffle(room_pairs)
         rooms, rooms_colors = zip(*room_pairs)
 
-        # 문의 경우는 그대로 유지
         doors = [DOOR_SIZE, DOOR_SIZE, DOOR_SIZE, DOOR_SIZE]
         doors_colors = [DOOR, DOOR, DOOR, DOOR]
 
-        # 셔플된 방과 원래 문의 순서를 합침
         self.BOX_SIZES = list(rooms) + doors
         self.BOX_COLORS = list(rooms_colors) + doors_colors
         return np.array(pygame.surfarray.array3d(self.screen))
@@ -367,17 +357,17 @@ class layoutAI:
                 if 0 <= new_pos[0] < WIDTH - BOX_SIZES[self.current_box][0] + 1 and 0 <= new_pos[1] < HEIGHT - BOX_SIZES[self.current_box][1] + 1:
                     self.current_pos = new_pos
                     
-        # room 이 placed 된다.
+        # room placed
         if action == 4:
             if self.current_pos[0] + BOX_SIZES[self.current_box][0] > WIDTH or self.current_pos[1] + BOX_SIZES[self.current_box][1] > WIDTH:
                 print("out of bound")
                 reward = -10
                 state_rgb = np.array(pygame.surfarray.array3d(self.screen))
-                state_rgb = np.transpose(state_rgb, (1, 0, 2))  # (height, width, 3)로 맞춤
+                state_rgb = np.transpose(state_rgb, (1, 0, 2))  # (height, width, 3)
                 
                 state_rgb_with_box = state_rgb.copy()
 
-                y, x = self.current_pos[1], self.current_pos[0]  # (x, y) 좌표 조정
+                y, x = self.current_pos[1], self.current_pos[0]  # (x, y)
                 h, w = BOX_SIZES[self.current_box][1], BOX_SIZES[self.current_box][0]
                 
                 cv2.rectangle(state_rgb_with_box, (x, y), (x + w, y + h), (0, 0, 255), thickness=1)
@@ -389,11 +379,11 @@ class layoutAI:
             self._draw()
             
             state_rgb = np.array(pygame.surfarray.array3d(self.screen))
-            state_rgb = np.transpose(state_rgb, (1, 0, 2))  # (height, width, 3)로 맞춤
+            state_rgb = np.transpose(state_rgb, (1, 0, 2))  # (height, width, 3)
             
             state_rgb_with_box = state_rgb.copy()
 
-            y, x = self.current_pos[1], self.current_pos[0]  # (x, y) 좌표 조정
+            y, x = self.current_pos[1], self.current_pos[0]  # (x, y)
             h, w = BOX_SIZES[self.current_box][1], BOX_SIZES[self.current_box][0]
             
             cv2.rectangle(state_rgb_with_box, (x, y), (x + w, y + h), (0, 0, 255), thickness=1)
@@ -406,16 +396,11 @@ class layoutAI:
                 living_bath2 = 0
                 living_bed2 = 0
                 
-                # placed_boxes에는 (box_index, position) 튜플들이 들어있음.
-                # room들은 box_index가 total_rooms 미만인 것으로 가정
-                # rendered state 이미지(state)에서 각 room의 색상이 존재하는지 검사
                 placed_rooms_info = {}
                 for room_color in [LIVING, BED1, BATH1, BED2, BATH2]:
-                    # state가 (height, width, 3) 형태라고 가정합니다.
                     mask = np.all(state_rgb == np.array(room_color), axis=-1)
                     if np.any(mask):
                         placed_rooms_info[room_color] = True
-                # 예를 들어, LIVING과 BED1의 연결성을 확인하고 싶다면
                 # mask1 = np.all(state_rgb == np.array(LIVING), axis=-1)
                 # mask2 = np.all(state_rgb == np.array(BED1), axis=-1)
                 # print(f"mask1: {mask1.any()}; mask2: {mask2.any()}")
@@ -427,7 +412,6 @@ class layoutAI:
                         living_bed1 = 1
                     elif living_bed1 > 1:
                         living_bed1 = 1 / living_bed1
-                # 다른 pair들도 동일한 방식으로 검사할 수 있습니다.
                 if BED1 in placed_rooms_info and BATH1 in placed_rooms_info:
                     # Image.fromarray(state_rgb).save("state_test_bed1_bath1.png")
                     bed1_bath1 = self.check_adjacent(np.array(state_rgb), BED1, BATH1)
@@ -484,11 +468,10 @@ class layoutAI:
                 # print(f"New position after placement: {self.current_pos}") #added print statement
             else:
                 done = True
-                # door placement 포함.
                 pass
         self._draw()
         state_rgb = np.array(pygame.surfarray.array3d(self.screen))
-        state_rgb = np.transpose(state_rgb, (1, 0, 2))  # (height, width, 3)로 맞춤
+        state_rgb = np.transpose(state_rgb, (1, 0, 2))  # (height, width, 3)
         
         state_rgb_with_box = state_rgb.copy()
 
