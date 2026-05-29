@@ -1,0 +1,10 @@
+gym
+opencv-python
+numpy
+torch
+pygame
+Pillow
+scipy
+
+# Optional, only needed when spatial integration reward is enabled:
+# GDAL
